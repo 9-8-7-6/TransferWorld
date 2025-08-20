@@ -26,7 +26,7 @@ pub async fn stun_query(server: &str) -> anyhow::Result<(String, u16)> {
 
     socket.send(&req).await?;
 
-    // 收回應
+    // Receive the Response
     let mut buf = [0u8; 1500];
     let (n, _) = timeout(Duration::from_secs(3), socket.recv_from(&mut buf)).await??;
 
@@ -95,7 +95,7 @@ pub async fn stun_query(server: &str) -> anyhow::Result<(String, u16)> {
             _ => {}
         }
 
-        // 4-byte 對齊
+        // 4-byte allign
         let pad = (4 - (attr_len % 4)) % 4;
         pos += attr_len + pad;
     }
