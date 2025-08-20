@@ -1,19 +1,15 @@
-use image::Luma;
-use qrcode::QrCode;
-use std::fs;
+pub mod qr_code;
+pub mod stun;
 
-fn create_qr_code() {
-    let code = QrCode::new(b"01234567").unwrap();
+use crate::qr_code::create_qr_code;
+use crate::stun::stun_query;
 
-    let image = code.render::<Luma<u8>>().build();
-
-    fs::create_dir_all("./image").unwrap();
-
-    image.save("./image/qrcode.png").unwrap();
-
-    let _ = code.render().light_color(' ').dark_color('#').build();
-}
-
-fn main() {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     create_qr_code();
+    match stun_query("stun.l.google.com:19302").await {
+        Ok((ip, port)) => println!("External IP: {ip}, Port: {port}"),
+        Err(e) => eprintln!("STUN query failed: {e}"),
+    }
+    Ok(())
 }
